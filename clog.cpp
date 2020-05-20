@@ -16,6 +16,14 @@ CLog::CLog()
 
 }
 
+/**
+ * @brief CLog::LogMsg
+ * @param nType
+ * @param pszFunction
+ * @param pszFile
+ * @param iLine
+ * @param pStr
+ */
 void CLog::LogMsg( int nType, const char *pszFunction, const char *pszFile, const int iLine, const char *pStr )
 {
     int fid;
@@ -69,7 +77,7 @@ void CLog::LogMsg( int nType, const char *pszFunction, const char *pszFile, cons
 
             sprintf( szFileLine, "[%s:%d{%s}]\t\t" , pszFile, iLine, pszFunction );
 
-            if( szFileLine[0] != NULL ) {
+            if( szFileLine[0] != 0 ) {
                 strcat( m_szLog, szFileLine );
             }
             if( pStr != NULL ) {
@@ -84,7 +92,11 @@ void CLog::LogMsg( int nType, const char *pszFunction, const char *pszFile, cons
 
 }
 
-
+/**
+ * @brief Log
+ * @param nType
+ * @param fmt
+ */
 void Log( int nType, const char *fmt, ... )
 {
 

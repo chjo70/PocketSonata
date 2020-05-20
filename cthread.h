@@ -34,13 +34,26 @@ private:
 
 public:
     CThread( int iMsgKey );
+    ~CThread();
 
+    void Run();
     void Run( void *(*Func)(void*) );
     int Pend();
     void Stop();
+    int QMsgRcv();
 
     inline key_t GetKeyId() { return m_MsgKeyID; }
     inline STR_MessageData *GetDataMessage() { return & m_Msg; }
+
+    static void *CallBack( void *pArg ) {
+        CThread *pThhread = static_cast<CThread*> (pArg);
+
+        pThhread->_routine();
+
+        return NULL;
+    }
+
+    virtual void _routine() { }
 
     //pthread_create(&thread,NULL,thread_routine, NULL);
 };

@@ -1,5 +1,6 @@
 #include "cthread.h"
 #include <errno.h>
+#include "clog.h"
 
 #ifndef S_DEFFILEMODE
 #define S_DEFFILEMODE   (S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH)
@@ -7,6 +8,8 @@
 
 CThread::CThread( int iMsgKey )
 {
+    m_MainThread = -1;
+
     // 메시지큐 생성
     memset( & m_Msg, 0, sizeof(STR_MessageData) );
 
@@ -18,16 +21,36 @@ CThread::CThread( int iMsgKey )
     }
 }
 
+CThread::~CThread()
+{
+    pthread_join( m_MainThread, NULL);
+}
+
 /**
- * @brief CThread::Run
+ * @brief CThread::Create
  */
 void CThread::Run( void *(*Func)(void*) )
 {
-    printf( "\n Run..." );
+    printf( "\n Running thread..." );
 
     pthread_create( & m_MainThread, NULL, Func, this );
 
 }
+
+void CThread::Run()
+{
+    printf( " Running thread...\n" );
+
+    pthread_create( & m_MainThread, NULL, CallBack, this );
+
+}
+
+//static void *CThread::CallBack( void *pArg )
+//{
+//    CThread *pThhread = static_cast<CThread*> (pArg);
+
+//    pThhread->_routine();
+//}
 
 /**
  * @brief CThread::Pend
@@ -52,4 +75,18 @@ int CThread::Pend()
 void CThread::Stop()
 {
     // pthread_exit();
+}
+
+/**
+ * @brief CThread::QMsgRcv
+ * @return
+ */
+int CThread::QMsgRcv()
+{
+    LOGENTRY;
+
+    int iMsgRcv = msgrcv( m_MsgKeyID, (void *) & m_Msg, sizeof(STR_MessageData)-sizeof(long), (1 >> 1), 0);
+
+    return iMsgRcv;
+
 }

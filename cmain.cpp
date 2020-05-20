@@ -1,19 +1,26 @@
+
+#define _MAIN_GLOBALS_
+
 #include "cmain.h"
 #include "clog.h"
+#include "mysocket.h"
 
 extern void usrAppStart();
 
-
+CMySocket g_theMySocket( g_iKeyId );
 
 void usrAppStart()
 {
 
-    //pTheMain = new CMain;
-    //delete pTheMain;
+    LOGMSG( enNormal, "쓰레드를 구동합니다." );
 
-    LOGMSG( enNormal, "프로그램을 시작합니다." );
-
+    //
     MAIN->Run();
+    g_theMySocket.Run();
+
+    while( true ) {
+        sleep( 10000000 );
+    }
 
 }
 
@@ -22,11 +29,12 @@ CMain* CMain::pInstance = nullptr;
 /**
  * @brief CMain::CMain
  */
-CMain::CMain()
+CMain::CMain( int iKeyId ) : CThread( iKeyId )
 {
     LOGENTRY;
 
-    Init();
+    //Init();
+    //Run( );
 }
 
 /**
@@ -82,5 +90,23 @@ void CMain::Init()
  */
 void CMain::Run()
 {
+    LOGENTRY;
+
+    CThread::Run();
+
+}
+
+/**
+ * @brief CMain::_routine
+ */
+void CMain::_routine()
+{
+    LOGENTRY;
+
+    while( true ) {
+        if( QMsgRcv() == -1 ) {
+            perror( "error ");
+        }
+    }
 
 }

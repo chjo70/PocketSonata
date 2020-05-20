@@ -1,10 +1,11 @@
 #ifndef CMAIN_H
 #define CMAIN_H
 
+#include "_system.h"
 #include "cthread.h"
 
 
-class CMain
+class CMain : public CThread
 {
 private:
     static CMain *pInstance;
@@ -13,13 +14,14 @@ private:
     void Init();
 
 public:
-    CMain();
+    CMain( int iKeyId );
     void Run();
+    virtual void _routine();
 
     static CMain* GetInstance()
     { // 게으른 초기화
         if(pInstance == NULL) {
-            pInstance = new CMain();
+            pInstance = new CMain( g_iKeyId );
         }
         return pInstance;
     }

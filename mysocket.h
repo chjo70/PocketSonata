@@ -8,6 +8,12 @@
 #define MAX_CLIENTS     (30)
 #define PORT            (8888)
 
+typedef struct {
+    unsigned int opCode;
+    unsigned int uiLength;
+
+} STR_LAN_HEADER ;
+
 class CMySocket : public CThread
 {
 public:

@@ -1,3 +1,6 @@
+
+#include <stdio.h>
+#include <unistd.h>
 #include <errno.h>
 #include <unistd.h>
 #include <arpa/inet.h>
@@ -32,7 +35,7 @@ void CMySocket::_routine()
 {
     LOGENTRY;
 
-    int opt = true, addrlen, i, iActivity;
+    int opt = true, addrlen, i, iActivity, iRead;
     int iClientSocket[MAX_CLIENTS];
     int iMasterSocket, iMaxSocket, iSocket, iNewSocket;
 
@@ -40,6 +43,8 @@ void CMySocket::_routine()
 
     //set of socket descriptors
     fd_set readfds;
+
+    STR_LAN_HEADER strLanHeader;
 
     //initialise all client_socket[] to 0 so not checked
     for( i=0 ; i < MAX_CLIENTS ; i++) {
@@ -90,8 +95,9 @@ void CMySocket::_routine()
             iSocket = iClientSocket[i];
 
             //if valid socket descriptor then add to read list
-            if(iSocket > 0)
+            if(iSocket > 0) {
                 FD_SET( iSocket , &readfds);
+            }
 
             //highest file descriptor number, need it for the select function
             if(iSocket > iMaxSocket) {
@@ -126,6 +132,33 @@ void CMySocket::_routine()
             }
         }
 
+        //else its some IO operation on some other socket
+        for ( i = 0; i < MAX_CLIENTS; i++ ) {
+            iSocket = iClientSocket[i];
+
+            if (FD_ISSET( iSocket , &readfds)) {
+                //Check if it was for closing , and also read the
+                //incoming message
+                if (( iRead = read( iSocket , & strLanHeader, sizeof(STR_LAN_HEADER) ) ) == 0 ) {
+                    //Somebody disconnected , get his details and print
+                    getpeername(iSocket , (struct sockaddr*)&address , (socklen_t*)&addrlen);
+                    printf( "Host disconnected , ip %s , port %d \n" , inet_ntoa(address.sin_addr) , ntohs(address.sin_port));
+
+                    //Close the socket and mark as 0 in list for reuse
+                    close( iSocket );
+                    iClientSocket[i] = 0;
+                }
+                //Echo back the message that came in
+                else {
+                    //msgsnd( );
+                    //set the string terminating NULL byte on the end
+                    //of the data read
+                    //buffer[valread] = '\0';
+                    //send(sd , buffer , strlen(buffer) , 0 );
+                }
+
+            }
+        }
     }
 
 }

@@ -6,6 +6,7 @@ CONFIG -= qt
 SOURCES += \
         clog.cpp \
         cmain.cpp \
+        cprompt.cpp \
         creclan.cpp \
         cthread.cpp \
         main.cpp \
@@ -16,6 +17,7 @@ HEADERS += \
     _system.h \
     clog.h \
     cmain.h \
+    cprompt.h \
     creclan.h \
     cthread.h \
     mysocket.h \
@@ -24,3 +26,4 @@ HEADERS += \
 QMAKE_CXXFLAGS += -std=c++0x -pthread
 
 LIBS += -pthread
+LIBS += -lreadline

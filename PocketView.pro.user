@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.11.1, 2020-05-23T23:32:17. -->
+<!-- Written by QtCreator 4.11.1, 2020-05-24T19:44:52. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -285,8 +285,9 @@
     </valuelist>
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/home/chjo70/Lab/Qt/PocketView/PocketView.pro</value>
-    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/home/chjo70/Lab/Qt/PocketView/PocketView.pro</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">PocketView2</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/home/chjo70/Lab/Qt/PocketSonata/PocketView.pro</value>
+    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/home/chjo70/Lab/Qt/PocketSonata/PocketView.pro</value>
     <value type="QString" key="RunConfiguration.Arguments"></value>
     <value type="bool" key="RunConfiguration.Arguments.multi">false</value>
     <value type="QString" key="RunConfiguration.OverrideDebuggerStartup"></value>
@@ -297,7 +298,7 @@
     <value type="bool" key="RunConfiguration.UseQmlDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
     <value type="QString" key="RunConfiguration.WorkingDirectory"></value>
-    <value type="QString" key="RunConfiguration.WorkingDirectory.default"></value>
+    <value type="QString" key="RunConfiguration.WorkingDirectory.default">/home/chjo70/Lab/Qt/build-PocketView-Desktop_Qt_5_14_2_GCC_64bit-Debug</value>
    </valuemap>
    <value type="int" key="ProjectExplorer.Target.RunConfigurationCount">1</value>
   </valuemap>

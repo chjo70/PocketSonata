@@ -7,6 +7,7 @@
 #include "clog.h"
 #include "mysocket.h"
 #include "creclan.h"
+#include "cprompt.h"
 
 extern void usrAppStart();
 
@@ -25,7 +26,7 @@ CMySocket g_theMySocket( g_iKeyId++ );
  */
 void usrAppStart()
 {
-    LOGMSG( enNormal, "\n\n\n" );
+    LOGMSG( enNormal, "\n\n" );
 
     LOGENTRY;
     LOGMSG2( enNormal, "[%s:%s] 프로그램을 구동합니다.", PROGRAM_NAME, PROGRAM_VERSION );
@@ -41,6 +42,7 @@ void usrAppStart()
 
     g_theMySocket.Run();
     RECLAN->Run();
+    PROMPT->Run();
 
     pause();
 

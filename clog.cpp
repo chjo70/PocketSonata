@@ -12,6 +12,9 @@
 
 CLog* CLog::pInstance = nullptr;
 
+/**
+ * @brief CLog::CLog
+ */
 CLog::CLog()
 {
     if( sem_init( & mutex, 1, 1 ) < 0 ) {
@@ -28,12 +31,14 @@ CLog::CLog()
  * @param iLine
  * @param pStr
  */
-void CLog::LogMsg( int nType, const char *pszFunction, const char *pszFile, const int iLine, const char *fmt, ... )
+void CLog::LogMsg( int nType, const char *pszFunction, const char *pszFile, const int iLine, const char *pMsg, ... )
 {
     int fid;
 
     char szDate[LOG_DIR_SIZE];
     char szFileLine[LOG_DIR_SIZE];
+
+    va_list args;
 
     sem_wait( & mutex );
 
@@ -41,8 +46,6 @@ void CLog::LogMsg( int nType, const char *pszFunction, const char *pszFile, cons
 
     strcpy( m_szLogDir, m_szPresentDirectory );
     strcat( m_szLogDir, LOG_DIRECTORY );
-
-    va_list args;
 
     if( 0 == mkdir( m_szLogDir, 0776 ) || errno == EEXIST ) {
         time_t timer;
@@ -88,17 +91,16 @@ void CLog::LogMsg( int nType, const char *pszFunction, const char *pszFile, cons
             if( szFileLine[0] != 0 ) {               
                 strcat( m_szLog, szFileLine );
             }
-            if( fmt != NULL ) {
-                int length;
+            if( pMsg != NULL ) {
+                int nLength;
 
-                length = strlen( m_szLog );
-                va_start( args, fmt );
-                vsprintf( & m_szLog[length], fmt, args );
+                nLength = strlen(m_szLog);
+                va_start( args, pMsg );
+                vsprintf( & m_szLog[nLength], pMsg, args );
                 va_end( args );
 
-                puts( & m_szLog[length] );
-
-                //strcat( m_szLog, pStr );
+                puts( & m_szLog[nLength] );
+                //strcat( & m_szLog[nLength], pMsg );
             }
 
             write( fid, m_szLog, strlen(m_szLog) );
@@ -111,3 +113,19 @@ void CLog::LogMsg( int nType, const char *pszFunction, const char *pszFile, cons
 
 }
 
+/**
+ * @brief CLog::LogMsg
+ * @param nType
+ * @param fmt
+ */
+void CLog::LogMsg( int nType, const char *fmt, ... )
+{
+    va_list args;
+
+    va_start( args, fmt );
+    vsprintf( m_szLogString, fmt, args );
+    va_end( args );
+
+    LOGMSG( nType, m_szLogString );
+
+}

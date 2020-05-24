@@ -1,6 +1,8 @@
 
 #define _MAIN_GLOBALS_
 
+#include <signal.h>
+
 #include "cmain.h"
 #include "clog.h"
 #include "mysocket.h"
@@ -8,18 +10,31 @@
 
 extern void usrAppStart();
 
+void signalHandler(int signo);
+
+
 ////////////////////////////////////////////////////////////////////////////////////////
 // 아래에 타스크 관련 클래스를 정의합니다.
 CMySocket g_theMySocket( g_iKeyId++ );
-//CRecLan g_theRecLan( g_iKeyId++ );
+
+
+
 
 /**
  * @brief usrAppStart
  */
 void usrAppStart()
 {
+    LOGMSG( enNormal, "\n\n\n" );
+
     LOGENTRY;
-    LOGMSG( enNormal, "쓰레드를 구동합니다." );
+    LOGMSG2( enNormal, "[%s:%s] 프로그램을 구동합니다.", PROGRAM_NAME, PROGRAM_VERSION );
+
+    signal( SIGINT, signalHandler);
+    signal( SIGABRT, signalHandler);
+    signal( SIGHUP, signalHandler);
+    signal( SIGTERM, signalHandler);
+    signal( SIGSTOP, signalHandler);
 
     //
     MAIN->Run();
@@ -27,12 +42,37 @@ void usrAppStart()
     g_theMySocket.Run();
     RECLAN->Run();
 
+    pause();
 
     while( true ) {
         sleep( 10000000 );
     }
 
 }
+
+void signalHandler( int signo )
+{
+
+  if( msgctl( MAIN->GetKeyId(), IPC_RMID, 0) == -1) { // msqid 메시지 큐 삭제
+      perror("msgctl failed");
+      exit(1);
+   }
+
+  if( msgctl( RECLAN->GetKeyId(), IPC_RMID, 0) == -1) { // msqid 메시지 큐 삭제
+      perror("msgctl failed");
+      exit(1);
+   }
+
+  if( msgctl( g_theMySocket.GetKeyId(), IPC_RMID, 0) == -1) { // msqid 메시지 큐 삭제
+      perror("msgctl failed");
+      exit(1);
+   }
+
+   printf( "\n SIGNO[%d] Handler\n" , signo );
+   exit(0);
+
+}
+
 
 // 클래스 내의 정적 멤버변수 값 정의
 char CMain::m_szClassName[LENGTH_OF_CLASSNAME] = { "CMain" };

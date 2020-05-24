@@ -42,7 +42,7 @@ void CThread::Run( void *(*Func)(void*) )
  */
 void CThread::Run()
 {
-    LOGMSG3( enNormal, " Running thread...%s\n", ChildClassName() );
+    LOGMSG1( enNormal, " Running thread...%s", ChildClassName() );
 
     pthread_create( & m_MainThread, NULL, CallBack, this );
 

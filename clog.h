@@ -19,11 +19,12 @@ enum LogType {
     enEnd,
 };
 
-#define LOGMSG( A, B )      LOG->LogMsg( A, __FUNCTION__, __FILE__, __LINE__, B )
-#define LOGMSG3( A, B, C )      LOG->LogMsg( A, __FUNCTION__, __FILE__, __LINE__, B, C )
+#define LOGMSG( A, B )          LOG->LogMsg( A, __FUNCTION__, __FILE__, __LINE__, B )
+#define LOGMSG1( A, B, C )      LOG->LogMsg( A, __FUNCTION__, __FILE__, __LINE__, B, C )
+#define LOGMSG2( A, B, C, D )   LOG->LogMsg( A, __FUNCTION__, __FILE__, __LINE__, B, C, D )
 
-#define LOGMSG2( A, B )     LOG->LogMsg( A, NULL, NULL, NULL, B )
-#define LOGENTRY            LOG->LogMsg( enNormal, __FUNCTION__, __FILE__, __LINE__, NULL )
+
+#define LOGENTRY                LOG->LogMsg( enNormal, __FUNCTION__, __FILE__, __LINE__, NULL )
 
 class CLog
 {
@@ -36,6 +37,7 @@ private:
     char m_szLogDir[LOG_DIR_SIZE*2];
 
     char m_szLog[LOG_DIR_SIZE*5];
+    char m_szLogString[LOG_DIR_SIZE*5];
 
 public:
     CLog();
@@ -49,7 +51,9 @@ public:
     }
 
     void LogMsg( int nType, char *pMsg );
-    void LogMsg( int nType, const char *pszFunction, const char *pszFile, const int iLine, const char *fmt, ... );
+    void LogMsg( int nType, const char *pszFunction, const char *pszFile, const int iLine, const char *pMsg, ... );
+
+    void LogMsg( int nType, const char *fmt, ... );
 
 };
 

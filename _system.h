@@ -1,9 +1,16 @@
 #ifndef _SYSTEM_H
 #define _SYSTEM_H
 
+
+
+#define PROGRAM_NAME        "PocketSonata"
+#define PROGRAM_VERSION     "Ver 0.1a"
+
 // 로그 디렉토리
 #define LOG_DIRECTORY       ("/LOG")
 #define LENGTH_OF_CLASSNAME (20)
+
+
 
 
 

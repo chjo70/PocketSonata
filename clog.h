@@ -2,8 +2,11 @@
 #define CLOG_H
 
 #include <stdio.h>
+#include <semaphore.h>
 
 #include "_system.h"
+
+
 
 #define LOG_DIR_SIZE        (1024)
 
@@ -17,6 +20,8 @@ enum LogType {
 };
 
 #define LOGMSG( A, B )      LOG->LogMsg( A, __FUNCTION__, __FILE__, __LINE__, B )
+#define LOGMSG3( A, B, C )      LOG->LogMsg( A, __FUNCTION__, __FILE__, __LINE__, B, C )
+
 #define LOGMSG2( A, B )     LOG->LogMsg( A, NULL, NULL, NULL, B )
 #define LOGENTRY            LOG->LogMsg( enNormal, __FUNCTION__, __FILE__, __LINE__, NULL )
 
@@ -24,6 +29,8 @@ class CLog
 {
 private:
     static CLog *pInstance;
+
+    sem_t mutex;
 
     char m_szPresentDirectory[LOG_DIR_SIZE];
     char m_szLogDir[LOG_DIR_SIZE*2];
@@ -42,11 +49,9 @@ public:
     }
 
     void LogMsg( int nType, char *pMsg );
-    void LogMsg( int nType, const char *pszFunction, const char *pszFile, const int iLine, const char *pStr );
-
+    void LogMsg( int nType, const char *pszFunction, const char *pszFile, const int iLine, const char *fmt, ... );
 
 };
-
 
 
 #define LOG     CLog::GetInstance()

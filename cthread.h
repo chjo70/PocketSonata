@@ -15,7 +15,7 @@
 struct STR_MessageData {
     long mtype;
 
-    union {
+    union UNI_MESSAGE {
         unsigned int opCode;
         char msg[256];
     } x ;
@@ -45,15 +45,10 @@ public:
     inline key_t GetKeyId() { return m_MsgKeyID; }
     inline STR_MessageData *GetDataMessage() { return & m_Msg; }
 
-    static void *CallBack( void *pArg ) {
-        CThread *pThhread = static_cast<CThread*> (pArg);
-
-        pThhread->_routine();
-
-        return NULL;
-    }
+    static void *CallBack( void *pArg );
 
     virtual void _routine() { }
+    virtual const char *ChildClassName() { }
 
     //pthread_create(&thread,NULL,thread_routine, NULL);
 };

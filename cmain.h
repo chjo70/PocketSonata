@@ -5,10 +5,13 @@
 #include "cthread.h"
 
 
+
+
 class CMain : public CThread
 {
 private:
     static CMain *pInstance;
+    static char m_szClassName[LENGTH_OF_CLASSNAME];
 
 private:
     void Init();
@@ -17,11 +20,12 @@ public:
     CMain( int iKeyId );
     void Run();
     virtual void _routine();
+    virtual const char *ChildClassName() { return m_szClassName; }
 
     static CMain* GetInstance()
     { // 게으른 초기화
         if(pInstance == NULL) {
-            pInstance = new CMain( g_iKeyId );
+            pInstance = new CMain( g_iKeyId++ );
         }
         return pInstance;
     }

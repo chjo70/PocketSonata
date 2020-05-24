@@ -10,8 +10,11 @@
 
 #include "mysocket.h"
 #include "clog.h"
+#include "creclan.h"
 
 
+// 클래스 내의 정적 멤버변수 값 정의
+char CMySocket::m_szClassName[LENGTH_OF_CLASSNAME] = { "CMySocket" };
 
 /**
  * @brief CMySocket::CMySocket
@@ -22,6 +25,9 @@ CMySocket::CMySocket( int iKeyId ) : CThread( iKeyId )
 
 }
 
+/**
+ * @brief CMySocket::Run
+ */
 void CMySocket::Run()
 {
     
@@ -35,16 +41,24 @@ void CMySocket::_routine()
 {
     LOGENTRY;
 
+    bool bHeader[MAX_CLIENTS];
+    UINT uiTotalRead[MAX_CLIENTS];
+
+    STR_LAN_HEADER strLanHeader[MAX_CLIENTS];
+    char szLanData[MAX_CLIENTS][MAX_LAN_DATA];
+
     int opt = true, addrlen, i, iActivity, iRead;
     int iClientSocket[MAX_CLIENTS];
     int iMasterSocket, iMaxSocket, iSocket, iNewSocket;
 
     struct sockaddr_in address;
 
+    char *pLanData;
+
     //set of socket descriptors
     fd_set readfds;
 
-    STR_LAN_HEADER strLanHeader;
+    STR_MessageData sndMsg;
 
     //initialise all client_socket[] to 0 so not checked
     for( i=0 ; i < MAX_CLIENTS ; i++) {
@@ -95,7 +109,7 @@ void CMySocket::_routine()
             iSocket = iClientSocket[i];
 
             //if valid socket descriptor then add to read list
-            if(iSocket > 0) {
+            if( iSocket > 0) {
                 FD_SET( iSocket , &readfds);
             }
 
@@ -125,7 +139,9 @@ void CMySocket::_routine()
                 //if position is empty
                 if( iClientSocket[i] == 0 ) {
                     iClientSocket[i] = iNewSocket;
-                    printf("Adding to list of sockets as %d\n" , i);
+                    bHeader[i] = true;
+                    uiTotalRead[i] = 0;
+                    printf( " Adding to list of sockets as %d\n" , i);
 
                     break;
                 }
@@ -136,29 +152,71 @@ void CMySocket::_routine()
         for ( i = 0; i < MAX_CLIENTS; i++ ) {
             iSocket = iClientSocket[i];
 
+            //Check if it was for closing , and also read the
+            //incoming message
             if (FD_ISSET( iSocket , &readfds)) {
-                //Check if it was for closing , and also read the
-                //incoming message
-                if (( iRead = read( iSocket , & strLanHeader, sizeof(STR_LAN_HEADER) ) ) == 0 ) {
-                    //Somebody disconnected , get his details and print
-                    getpeername(iSocket , (struct sockaddr*)&address , (socklen_t*)&addrlen);
-                    printf( "Host disconnected , ip %s , port %d \n" , inet_ntoa(address.sin_addr) , ntohs(address.sin_port));
-
-                    //Close the socket and mark as 0 in list for reuse
-                    close( iSocket );
-                    iClientSocket[i] = 0;
+                if( bHeader[i] == true ) {
+                    pLanData = (char *) & strLanHeader[i];
+                    if (( iRead = recv( iSocket , & pLanData[uiTotalRead[i]], sizeof(STR_LAN_HEADER)-uiTotalRead[i], MSG_DONTWAIT ) ) == 0 ) {
+                        CloseSocket( iSocket, & address, & iClientSocket[i] );
+                    }
+                    //Echo back the message that came in
+                    else {
+                        uiTotalRead[i] += iRead;
+                        if( uiTotalRead[i] == sizeof(STR_LAN_HEADER) ) {
+                            bHeader[i] = false;
+                            uiTotalRead[i] = 0;
+                        }
+                    }
                 }
-                //Echo back the message that came in
                 else {
-                    //msgsnd( );
-                    //set the string terminating NULL byte on the end
-                    //of the data read
-                    //buffer[valread] = '\0';
-                    //send(sd , buffer , strlen(buffer) , 0 );
-                }
+                    pLanData = (char *) & szLanData[i];
+                    if (( iRead = recv( iSocket , & pLanData[uiTotalRead[i]], strLanHeader[i].uiLength-uiTotalRead[i], MSG_DONTWAIT ) ) == 0 ) {
+                        CloseSocket( iSocket, & address, & iClientSocket[i] );
+                    }
+                    else {
+                        uiTotalRead[i] += iRead;
+                        if( uiTotalRead[i] == strLanHeader[i].uiLength ) {
+                            bHeader[i] = true;
+                            uiTotalRead[i] = 0;
 
+                            sndMsg.mtype = 1;
+                            sndMsg.x.opCode = strLanHeader[i].opCode;
+
+                            if( msgsnd( RECLAN->GetKeyId(), (void *)& sndMsg, sizeof(STR_MessageData)-sizeof(long), IPC_NOWAIT) < 0 ) {
+                                perror( "msgsnd 실패" );
+                            }
+                            else {
+                                // DisplayMsg( & sndMsg );
+
+                            }
+
+                        }
+                    }
+                }
             }
         }
     }
+
+}
+
+/**
+ * @brief CMySocket::CloseSocket
+ * @param iSocket
+ * @param pAddress
+ * @param pClientSocket
+ */
+void CMySocket::CloseSocket( int iSocket, struct sockaddr_in *pAddress, int *pClientSocket )
+{
+    int addrlen;
+
+    addrlen = sizeof(sockaddr_in);
+    //Somebody disconnected , get his details and print
+    getpeername(iSocket , (struct sockaddr*) pAddress , (socklen_t*)&addrlen);
+    printf( "Host disconnected , ip %s , port %d \n" , inet_ntoa(pAddress->sin_addr) , ntohs(pAddress->sin_port));
+
+    //Close the socket and mark as 0 in list for reuse
+    close( iSocket );
+    *pClientSocket = 0;
 
 }

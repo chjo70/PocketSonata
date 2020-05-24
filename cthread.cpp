@@ -31,15 +31,18 @@ CThread::~CThread()
  */
 void CThread::Run( void *(*Func)(void*) )
 {
-    printf( "\n Running thread..." );
+    LOGMSG( enNormal, "\n Running thread..." );
 
     pthread_create( & m_MainThread, NULL, Func, this );
 
 }
 
+/**
+ * @brief CThread::Run
+ */
 void CThread::Run()
 {
-    printf( " Running thread...\n" );
+    LOGMSG3( enNormal, " Running thread...%s\n", ChildClassName() );
 
     pthread_create( & m_MainThread, NULL, CallBack, this );
 
@@ -76,6 +79,16 @@ void CThread::Stop()
 {
     // pthread_exit();
 }
+
+void *CThread::CallBack( void *pArg )
+{
+    CThread *pThhread = static_cast<CThread*> (pArg);
+
+    pThhread->_routine();
+
+    return NULL;
+}
+
 
 /**
  * @brief CThread::QMsgRcv

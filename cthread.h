@@ -15,10 +15,9 @@
 struct STR_MessageData {
     long mtype;
 
-    union UNI_MESSAGE {
-        unsigned int opCode;
-        char msg[256];
-    } x ;
+    unsigned int opCode;
+    int iSocket;
+    char msg[256];
 
 } ;
 
@@ -48,7 +47,7 @@ public:
     static void *CallBack( void *pArg );
 
     virtual void _routine() { }
-    virtual const char *ChildClassName() { }
+    virtual const char *ChildClassName() { return NULL; }
 
     //pthread_create(&thread,NULL,thread_routine, NULL);
 };

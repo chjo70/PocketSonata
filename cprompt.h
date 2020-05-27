@@ -16,17 +16,22 @@ private:
 
     static char m_szListOfOwnCmds[NOOFOWNCMDS][50];
 
-
+    UINT m_uiDumpAddress;
+    UINT m_uiModifyAddress;
 
 
 private:
     int takeInput(char* str);
-    void openHelp();
+    void openHelp( int iArg=-1 );
     int ownCmdHandler(char** parsed);
     void parseSpace(char* str, char** parsed);
     int parsePipe(char* str, char** strpiped);
     int processString(char* str, char** parsed, char** parsedpipe);
     int CPromptparsePipe(char* str, char** strpiped);
+
+
+    void MemoryDump( UINT uiStartAddress, UINT uiEndAddress=0 );
+    void MemoryModify( UINT uiStartAddress, UINT uiDataType=1 );
 
 public:
     CPrompt( int iKeyId );

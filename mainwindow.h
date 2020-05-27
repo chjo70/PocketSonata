@@ -24,6 +24,7 @@ private slots:
 
     void onConnectServer();
     void connectionClosedByServer();
+    void onReadMessage();
 
     void on_pushButton_clicked();
 
@@ -32,6 +33,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
 
+    quint16 nextBlockSize;
     bool m_bConnect;
 
     QTcpSocket m_theTcpSocket;   //socket

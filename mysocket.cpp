@@ -141,7 +141,7 @@ void CMySocket::_routine()
                     iClientSocket[i] = iNewSocket;
                     bHeader[i] = true;
                     uiTotalRead[i] = 0;
-                    printf( " Adding to list of sockets as %d\n" , i);
+                    LOGMSG1( enNormal, " Adding to list of sockets as %d\n" , i);
 
                     break;
                 }
@@ -181,7 +181,10 @@ void CMySocket::_routine()
                             uiTotalRead[i] = 0;
 
                             sndMsg.mtype = 1;
-                            sndMsg.x.opCode = strLanHeader[i].opCode;
+                            sndMsg.opCode = strLanHeader[i].opCode;
+                            sndMsg.iSocket = iSocket;
+
+                            memcpy( & sndMsg.msg[0], pLanData, strLanHeader[i].uiLength );
 
                             if( msgsnd( RECLAN->GetKeyId(), (void *)& sndMsg, sizeof(STR_MessageData)-sizeof(long), IPC_NOWAIT) < 0 ) {
                                 perror( "msgsnd 실패" );
@@ -213,7 +216,7 @@ void CMySocket::CloseSocket( int iSocket, struct sockaddr_in *pAddress, int *pCl
     addrlen = sizeof(sockaddr_in);
     //Somebody disconnected , get his details and print
     getpeername(iSocket , (struct sockaddr*) pAddress , (socklen_t*)&addrlen);
-    printf( "Host disconnected , ip %s , port %d \n" , inet_ntoa(pAddress->sin_addr) , ntohs(pAddress->sin_port));
+    LOGMSG2( enNormal, "Host disconnected , ip %s , port %d \n" , inet_ntoa(pAddress->sin_addr) , ntohs(pAddress->sin_port));
 
     //Close the socket and mark as 0 in list for reuse
     close( iSocket );

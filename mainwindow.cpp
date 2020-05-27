@@ -15,6 +15,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect( & m_theTcpSocket, SIGNAL(connected()), this, SLOT(onConnectServer()) );
     connect( & m_theTcpSocket, SIGNAL(disconnected()), this, SLOT(connectionClosedByServer()));
+    connect( & m_theTcpSocket, SIGNAL(readyRead()), this, SLOT(onReadMessage()));
+
 }
 
 MainWindow::~MainWindow()
@@ -84,4 +86,39 @@ void MainWindow::on_pushButton_2_clicked()
     strReqDumpList.uiDataLength = 50;
 
     iRet = m_theTcpSocket.write( (char *) & strReqDumpList, sizeof(STR_REQ_DUMP_LIST) );
+}
+
+/**
+ * @brief MainWindow::onReadMessage
+ */
+void MainWindow::onReadMessage()
+{
+    QDataStream in( & m_theTcpSocket );
+
+    while( true ){
+         //nextBlcokSize 가 0 이면 아직 데이터를 못받은것
+        if( nextBlockSize == 0) {
+            //수신된 데이터가 nextBlockSize 바이트보다 큰지 확인
+            if(m_theTcpSocket.bytesAvailable() < sizeof(quint16))
+                ;
+            else
+                in>>nextBlockSize;
+            continue;
+        }
+        //nextBlcokSize가 도착하면 사이즈만큼 데이터가 도착했는지 확인
+       else if(m_theTcpSocket.bytesAvailable() < nextBlockSize)
+            continue;
+
+        //데이터를 표시
+       else if(m_theTcpSocket.bytesAvailable() >= nextBlockSize){
+            QString strBuf;
+            in>>strBuf;
+
+            ui->textEdit->setText(strBuf);
+            this->nextBlockSize = 0;
+
+            break;
+        }
+    }
+
 }

@@ -99,7 +99,9 @@ void CLog::LogMsg( int nType, const char *pszFunction, const char *pszFile, cons
                 vsprintf( & m_szLog[nLength], pMsg, args );
                 va_end( args );
 
-                puts( & m_szLog[nLength] );
+                if( nType == enDebug ) {
+                    puts( & m_szLog[nLength] );
+                }
                 //strcat( & m_szLog[nLength], pMsg );
             }
 

@@ -10,6 +10,8 @@ private:
     static CRecLan *pInstance;
     static char m_szClassName[LENGTH_OF_CLASSNAME];
 
+    STR_MessageData *m_pMsg;
+
 private:
 
 

@@ -25,8 +25,12 @@ struct STR_REQ_DUMP_LIST {
 };
 
 
+
 //////////////////////////////////////////////////////////////
 // 송신 메시지 정의
+
+#define     DUMP_DATA_SIZE              (16*10)
+
 enum enRES_MESSAGE {
     enRES_DUMP_LIST = enREQ_DUMP_LIST,
 
@@ -34,16 +38,16 @@ enum enRES_MESSAGE {
 } ;
 
 
+
 // 랜 메시지 구조체
-struct STR_LAN_DATA {
-    UINT uiLength;
+union UNI_LAN_DATA {
+    UINT uiResult;
 
-    union UNI_DATA {
-        UINT uiResult;
+    // 수신 메시지 구조체 정의
+    STR_REQ_DUMP_LIST strReqDumpList;
 
-        // 수신 메시지 구조체 정의
-        STR_REQ_DUMP_LIST strReqDumpList;
-    } x ;
+    // 송신 메시지 구조체 정의
+    char cData[500];
 
 };
 

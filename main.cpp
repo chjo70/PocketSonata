@@ -34,7 +34,7 @@ void *thread_routine( void *pArg )
             if( msgrcv( keyId, (void *) pMessageData, sizeof(STR_MessageData)-sizeof(long), (1 >> 1), 0)	== -1) {
 
             }
-            printf("\tnew thread:%d, opCode:%x\n",i, pMessageData->x.opCode );
+            printf("\tnew thread:%d, opCode:%x\n",i, pMessageData->opCode );
             i++;
             sleep(1);
         }

@@ -39,6 +39,8 @@ void MainWindow::onReadyRead()
 
 void MainWindow::on_pushButton_clicked()
 {
+    nextBlockSize = 0;
+
     if( m_bConnect == false ) {
         m_theTcpSocket.connectToHost(QHostAddress::LocalHost, 8888 );
     }

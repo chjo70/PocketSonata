@@ -8,7 +8,6 @@
 
 // 로그 디렉토리
 #define LOG_DIRECTORY       ("/LOG")
-#define LENGTH_OF_CLASSNAME (20)
 
 
 

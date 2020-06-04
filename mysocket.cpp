@@ -14,12 +14,12 @@
 
 
 // 클래스 내의 정적 멤버변수 값 정의
-char CMySocket::m_szClassName[LENGTH_OF_CLASSNAME] = { "CMySocket" };
+//char CMySocket::m_szClassName[LENGTH_OF_CLASSNAME] = { "CMySocket" };
 
 /**
  * @brief CMySocket::CMySocket
  */
-CMySocket::CMySocket( int iKeyId ) : CThread( iKeyId )
+CMySocket::CMySocket( int iKeyId, char *pClassName ) : CThread( iKeyId, pClassName )
 {
     LOGENTRY;
 

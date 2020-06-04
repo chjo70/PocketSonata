@@ -6,12 +6,14 @@
 #define S_DEFFILEMODE   (S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH)
 #endif
 
-CThread::CThread( int iMsgKey )
+CThread::CThread( int iMsgKey, char *pClassName )
 {
     m_MainThread = -1;
 
     // 메시지큐 생성
     memset( & m_Msg, 0, sizeof(STR_MessageData) );
+
+    strcpy( m_szClassName, pClassName );
 
     m_MsgKeyID = msgget( IPC_PRIVATE, 0666 | IPC_CREAT);
     if (m_MsgKeyID == -1 )

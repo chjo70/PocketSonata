@@ -8,7 +8,6 @@ class CRecLan : public CThread
 {
 private:
     static CRecLan *pInstance;
-    static char m_szClassName[LENGTH_OF_CLASSNAME];
 
     STR_MessageData *m_pMsg;
 
@@ -16,7 +15,7 @@ private:
 
 
 public:
-    CRecLan( int iKeyId );
+    CRecLan( int iKeyId, char *pClassName=NULL );
     void Run();
 
     // 명령에 대한 처리 함수 정의
@@ -29,7 +28,7 @@ public:
     static CRecLan* GetInstance()
     { // 게으른 초기화
         if(pInstance == NULL) {
-            pInstance = new CRecLan( g_iKeyId++ );
+            pInstance = new CRecLan( g_iKeyId++, (char*)"CRecLan" );
         }
         return pInstance;
     }

@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include "../PocketSonata/_sysmsg.h"
+
 
 /**
  * @brief MainWindow::MainWindow
@@ -37,16 +37,24 @@ void MainWindow::onReadyRead()
 {
 }
 
+/**
+ * @brief MainWindow::on_pushButton_clicked
+ */
 void MainWindow::on_pushButton_clicked()
 {
     nextBlockSize = 0;
 
     if( m_bConnect == false ) {
         m_theTcpSocket.connectToHost(QHostAddress::LocalHost, 8888 );
+
+        ui->MemoryDump->setEnabled(true);
+
     }
     else {
         m_theTcpSocket.close();
         m_bConnect = false;
+
+        ui->MemoryDump->setEnabled(false);
     }
 
 }
@@ -59,6 +67,8 @@ void MainWindow::onConnectServer()
     ui->pushButton->setText( tr("연결 해지") );
     m_bConnect = true;
 
+    m_bHeader = true;
+
 }
 
 /**
@@ -68,10 +78,108 @@ void MainWindow::connectionClosedByServer()
 {
     ui->pushButton->setText( tr("연결") );
     m_bConnect = false;
+
+    m_bHeader = true;
 }
 
 
-void MainWindow::on_pushButton_2_clicked()
+/**
+ * @brief MainWindow::onReadMessage
+ */
+void MainWindow::onReadMessage()
+{
+    int iRead;
+    char *pLanData;
+
+    UINT uiTotalRead=0;
+
+    STR_LAN_HEADER strLanHeader;
+    char szLanData[MAX_LAN_DATA];
+
+    while( true ) {
+         //nextBlcokSize 가 0 이면 아직 데이터를 못받은것
+        if( m_bHeader == true ) {
+            pLanData = (char *) & strLanHeader;
+            if (( iRead = m_theTcpSocket.read( & pLanData[uiTotalRead], sizeof(STR_LAN_HEADER)-uiTotalRead ) ) == 0 ) {
+                break;
+                // m_theTcpSocket.disconnectFromHost();
+                //CloseSocket( iSocket, & address, & iClientSocket[i] );
+            }
+            else {
+                uiTotalRead += iRead;
+                if( uiTotalRead == sizeof(STR_LAN_HEADER) ) {
+                    m_bHeader = false;
+                    uiTotalRead = 0;
+                }
+            }
+        }
+        else {
+            pLanData = (char *) & szLanData;
+            if (( iRead = m_theTcpSocket.read( & pLanData[uiTotalRead], strLanHeader.uiLength-uiTotalRead ) ) == 0 ) {
+                break;
+                //m_theTcpSocket.disconnectFromHost();
+            }
+            else {
+                uiTotalRead += iRead;
+                if( uiTotalRead == strLanHeader.uiLength ) {
+                    m_bHeader = true;
+                    uiTotalRead = 0;
+
+                    //데이터를 표시
+                    ParseAndDisplay( & strLanHeader, & szLanData[0] );
+
+                    QTextCharFormat format;
+                    format.setForeground(QColor(0x6F,0x77,0x97));
+                    QTextCursor cursor = ui->memoryDump->textCursor();
+                    cursor.select(QTextCursor::Document);
+                    cursor.mergeCharFormat(format);
+
+                    break;
+                }
+            }
+        }
+
+    }
+
+}
+
+/**
+ * @brief MainWindow::ParseAndDisplay
+ * @param pstLanHeader
+ * @param pByteData
+ */
+void MainWindow::ParseAndDisplay( STR_LAN_HEADER *pstLanHeader, char *pByteData )
+{
+    int i;
+
+    QString qBuffer;
+
+    switch( pstLanHeader->opCode ) {
+    case enREQ_DUMP_LIST :
+        {
+            STR_REQ_DUMP_LIST *pData = ( STR_REQ_DUMP_LIST * ) pByteData;
+
+            for( i=0 ; i < 10 ; ++i ) {
+
+            }
+        }
+        break;
+
+    default :
+        break;
+    }
+
+    qBuffer.sprintf( "AAAAA" );
+    ui->memoryDump->append( qBuffer );
+    //ui->memoryDump->moveCursor( QTextCursor::start);
+
+}
+
+
+/**
+ * @brief MainWindow::on_MemoryDump_clicked
+ */
+void MainWindow::on_MemoryDump_clicked()
 {
     int iRet;
 
@@ -88,39 +196,4 @@ void MainWindow::on_pushButton_2_clicked()
     strReqDumpList.uiDataLength = 50;
 
     iRet = m_theTcpSocket.write( (char *) & strReqDumpList, sizeof(STR_REQ_DUMP_LIST) );
-}
-
-/**
- * @brief MainWindow::onReadMessage
- */
-void MainWindow::onReadMessage()
-{
-    QDataStream in( & m_theTcpSocket );
-
-    while( true ){
-         //nextBlcokSize 가 0 이면 아직 데이터를 못받은것
-        if( nextBlockSize == 0) {
-            //수신된 데이터가 nextBlockSize 바이트보다 큰지 확인
-            if(m_theTcpSocket.bytesAvailable() < sizeof(quint16))
-                ;
-            else
-                in>>nextBlockSize;
-            continue;
-        }
-        //nextBlcokSize가 도착하면 사이즈만큼 데이터가 도착했는지 확인
-       else if(m_theTcpSocket.bytesAvailable() < nextBlockSize)
-            continue;
-
-        //데이터를 표시
-       else if(m_theTcpSocket.bytesAvailable() >= nextBlockSize){
-            QString strBuf;
-            in>>strBuf;
-
-            ui->textEdit->setText(strBuf);
-            this->nextBlockSize = 0;
-
-            break;
-        }
-    }
-
 }

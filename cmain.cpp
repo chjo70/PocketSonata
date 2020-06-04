@@ -8,6 +8,12 @@
 #include "mysocket.h"
 #include "creclan.h"
 #include "cprompt.h"
+#include "curbit.h"
+
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/ini_parser.hpp>
+
+
 
 extern void usrAppStart();
 
@@ -16,7 +22,7 @@ void signalHandler(int signo);
 
 ////////////////////////////////////////////////////////////////////////////////////////
 // 아래에 타스크 관련 클래스를 정의합니다.
-CMySocket g_theMySocket( g_iKeyId++ );
+CMySocket g_theMySocket( g_iKeyId++, (char *)"CMySocket" );
 
 
 
@@ -43,6 +49,7 @@ void usrAppStart()
     g_theMySocket.Run();
     RECLAN->Run();
     PROMPT->Run();
+    URBIT->Run();
 
     pause();
 
@@ -77,13 +84,13 @@ void signalHandler( int signo )
 
 
 // 클래스 내의 정적 멤버변수 값 정의
-char CMain::m_szClassName[LENGTH_OF_CLASSNAME] = { "CMain" };
+//char CMain::m_szClassName[LENGTH_OF_CLASSNAME] = { "CMain" };
 CMain* CMain::pInstance = nullptr;
 
 /**
  * @brief CMain::CMain
  */
-CMain::CMain( int iKeyId ) : CThread( iKeyId )
+CMain::CMain( int iKeyId, char *pClassName ) : CThread( iKeyId, pClassName )
 {
     LOGENTRY;
 

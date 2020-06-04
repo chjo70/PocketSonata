@@ -10,7 +10,6 @@
 
 
 // 클래스 내의 정적 멤버변수 값 정의
-char CRecLan::m_szClassName[LENGTH_OF_CLASSNAME] = { "CRecLan" };
 CRecLan* CRecLan::pInstance = nullptr;
 
 
@@ -18,7 +17,7 @@ CRecLan* CRecLan::pInstance = nullptr;
  * @brief CRecLan::CRecLan
  * @param iKeyId
  */
-CRecLan::CRecLan( int iKeyId ) : CThread( iKeyId )
+CRecLan::CRecLan( int iKeyId, char *pClassName ) : CThread( iKeyId, pClassName )
 {
    LOGENTRY;
 }

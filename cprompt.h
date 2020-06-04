@@ -12,7 +12,7 @@ class CPrompt : public CThread
 {
 private:
     static CPrompt *pInstance;
-    static char m_szClassName[LENGTH_OF_CLASSNAME];
+    //static char m_szClassName[LENGTH_OF_CLASSNAME];
 
     static char m_szListOfOwnCmds[NOOFOWNCMDS][50];
 
@@ -34,7 +34,7 @@ private:
     void MemoryModify( UINT uiStartAddress, UINT uiDataType=1 );
 
 public:
-    CPrompt( int iKeyId );
+    CPrompt( int iKeyId, char *pClassName=NULL );
 
     virtual void _routine();
     virtual const char *ChildClassName() { return m_szClassName; }
@@ -42,7 +42,7 @@ public:
     static CPrompt* GetInstance()
     { // 게으른 초기화
         if(pInstance == NULL) {
-            pInstance = new CPrompt( g_iKeyId++ );
+            pInstance = new CPrompt( g_iKeyId++, (char *)"CPrompt" );
         }
         return pInstance;
     }

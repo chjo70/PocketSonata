@@ -13,13 +13,13 @@
 class CMySocket : public CThread
 {
 private:
-    static char m_szClassName[LENGTH_OF_CLASSNAME];
+    //static char m_szClassName[LENGTH_OF_CLASSNAME];
 
 private:
     void CloseSocket( int iSocket, struct sockaddr_in *pAddress, int *pClientSocket );
 
 public:
-    CMySocket( int iKeyId );
+    CMySocket( int iKeyId, char *pClassName );
     void Run();
     virtual void _routine();
     virtual const char *ChildClassName() { return m_szClassName; }

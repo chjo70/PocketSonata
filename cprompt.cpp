@@ -20,15 +20,15 @@
 
 char CPrompt::m_szListOfOwnCmds[NOOFOWNCMDS][50] = { "md",
                                                      "mm",
-                                                     "help",
-                                                     "hello" } ;
+                                                     "setenv",
+                                                     "help" } ;
 
 
 // 클래스 내의 정적 멤버변수 값 정의
-char CPrompt::m_szClassName[LENGTH_OF_CLASSNAME] = { "CPrompt" };
+//char CPrompt::m_szClassName[LENGTH_OF_CLASSNAME] = { "CPrompt" };
 CPrompt* CPrompt::pInstance = nullptr;
 
-CPrompt::CPrompt( int iKeyId ) : CThread( iKeyId )
+CPrompt::CPrompt( int iKeyId, char *pClassName ) : CThread( iKeyId, pClassName )
 {
    LOGENTRY;
 
@@ -70,10 +70,11 @@ int CPrompt::takeInput(char* str)
 {
     char* buf;
 
-    buf = readline( "\n $> " );
+    buf = readline( " $> " );
     if (strlen(buf) != 0) {
         add_history(buf);
         strcpy(str, buf);
+        
         return 0;
     } else {
         return 1;

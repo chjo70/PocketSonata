@@ -5,6 +5,10 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 
+#include "../PocketSonata/_sysmsg.h"
+
+#define MAX_LAN_DATA            (1000)
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -17,6 +21,8 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    void ParseAndDisplay( STR_LAN_HEADER *pstLanHeader, char *pByteData );
+
 private slots:
     void newConnection();
     void onSocketStateChanged(QAbstractSocket::SocketState socketState);
@@ -28,13 +34,15 @@ private slots:
 
     void on_pushButton_clicked();
 
-    void on_pushButton_2_clicked();
+    void on_MemoryDump_clicked();
 
 private:
     Ui::MainWindow *ui;
 
     quint16 nextBlockSize;
     bool m_bConnect;
+
+    bool m_bHeader;
 
     QTcpSocket m_theTcpSocket;   //socket
     //QTcpServer *pServer;

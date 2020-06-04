@@ -12,6 +12,8 @@
 #include <sys/stat.h>
 #include <regex.h>
 
+#define LENGTH_OF_CLASSNAME (20)
+
 struct STR_MessageData {
     long mtype;
 
@@ -31,8 +33,11 @@ private:
     key_t m_MsgKeyID;
     STR_MessageData m_Msg;
 
+protected:
+    char m_szClassName[LENGTH_OF_CLASSNAME];
+
 public:
-    CThread( int iMsgKey );
+    CThread( int iMsgKey, char *pClassName );
     ~CThread();
 
     void Run();

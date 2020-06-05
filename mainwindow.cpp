@@ -13,9 +13,14 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    ui->spinBoxStartAddress->setRange(UINT_MAX);
+    ui->spinBoxStartAddress->setPrefix("0x");
+
     connect( & m_theTcpSocket, SIGNAL(connected()), this, SLOT(onConnectServer()) );
     connect( & m_theTcpSocket, SIGNAL(disconnected()), this, SLOT(connectionClosedByServer()));
     connect( & m_theTcpSocket, SIGNAL(readyRead()), this, SLOT(onReadMessage()));
+
+
 
 }
 
@@ -150,17 +155,40 @@ void MainWindow::onReadMessage()
  */
 void MainWindow::ParseAndDisplay( STR_LAN_HEADER *pstLanHeader, char *pByteData )
 {
-    int i;
+    int i, j;
 
     QString qBuffer;
 
     switch( pstLanHeader->opCode ) {
-    case enREQ_DUMP_LIST :
+    case enRES_DUMP_LIST :
         {
-            STR_REQ_DUMP_LIST *pData = ( STR_REQ_DUMP_LIST * ) pByteData;
+            char *pData, *pValue;
+            STR_RES_DUMP_LIST *pstrResDumpList = ( STR_RES_DUMP_LIST * ) pByteData;
 
-            for( i=0 ; i < 10 ; ++i ) {
+            ui->memoryDump->clear();
 
+            pData = & pstrResDumpList->cData[0];
+            for( i=0 ; i < pstrResDumpList->strReqDumpList.uiDataLength ; i+=16 ) {
+                qBuffer.sprintf( "0x%08X  " , pstrResDumpList->strReqDumpList.uiAddress+i );
+                pValue = pData;
+                ui->memoryDump->insertPlainText( qBuffer );
+                for( j=0 ; j < 16 && i+j < pstrResDumpList->strReqDumpList.uiDataLength ; ++j ) {
+                    qBuffer.sprintf( "%02X " , *pValue++ );
+                    ui->memoryDump->insertPlainText( qBuffer );
+                }
+
+                pValue = pData;
+                for( j=0 ; j < 16 && i+j < pstrResDumpList->strReqDumpList.uiDataLength ; ++j ) {
+                    qBuffer.sprintf( "%01c" , *pValue );
+                    if( isprint( *pValue ) )
+                        ui->memoryDump->insertPlainText( qBuffer );
+                    else
+                        ui->memoryDump->insertPlainText( " " );
+                    ++ pValue;
+                }
+                pData += 16;
+
+                ui->memoryDump->insertPlainText( "\n" );
             }
         }
         break;
@@ -169,8 +197,6 @@ void MainWindow::ParseAndDisplay( STR_LAN_HEADER *pstLanHeader, char *pByteData 
         break;
     }
 
-    qBuffer.sprintf( "AAAAA" );
-    ui->memoryDump->append( qBuffer );
     //ui->memoryDump->moveCursor( QTextCursor::start);
 
 }
@@ -191,7 +217,7 @@ void MainWindow::on_MemoryDump_clicked()
 
     iRet = m_theTcpSocket.write( (char *) & strLanHeader, sizeof(STR_LAN_HEADER) );
 
-    strReqDumpList.uiAddress = 0x100000;
+    strReqDumpList.uiAddress = ui->spinBoxStartAddress->value();
     strReqDumpList.uiDataSize = 1;
     strReqDumpList.uiDataLength = 50;
 

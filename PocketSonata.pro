@@ -10,6 +10,7 @@ SOURCES += \
         creclan.cpp \
         cthread.cpp \
         curbit.cpp \
+        dev/minIni.c \
         main.cpp \
         mysocket.cpp
 
@@ -22,6 +23,15 @@ HEADERS += \
     creclan.h \
     cthread.h \
     curbit.h \
+    dev/minGlue-FatFs.h \
+    dev/minGlue-ccs.h \
+    dev/minGlue-efsl.h \
+    dev/minGlue-ffs.h \
+    dev/minGlue-mdd.h \
+    dev/minGlue-stdio.h \
+    dev/minGlue.h \
+    dev/minIni.h \
+    dev/wxMinIni.h \
     mysocket.h \
     tcpip.h
 

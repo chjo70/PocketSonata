@@ -5,6 +5,8 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 
+#include "CHexSpinBox.h"
+
 #include "../PocketSonata/_sysmsg.h"
 
 #define MAX_LAN_DATA            (1000)

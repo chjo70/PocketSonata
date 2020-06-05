@@ -87,7 +87,8 @@ void CRecLan::DumpList()
     iRet = send( m_pMsg->iSocket, (char *) & strLanHeader, sizeof(STR_LAN_HEADER), MSG_DONTWAIT );
 
     // 랜 데이터 송신
-    memcpy( uniLanData.cData, pBuffer, DUMP_DATA_SIZE );
+    memcpy( & uniLanData.strResDumpList.strReqDumpList, pData, sizeof(STR_REQ_DUMP_LIST) );
+    memcpy( uniLanData.strResDumpList.cData, pBuffer, DUMP_DATA_SIZE );
 
     iRet = send( m_pMsg->iSocket, (char *) & uniLanData, strLanHeader.uiLength, MSG_DONTWAIT );
 

@@ -98,7 +98,7 @@ void *CThread::CallBack( void *pArg )
  */
 int CThread::QMsgRcv()
 {
-    LOGENTRY;
+    //LOGENTRY;
 
     int iMsgRcv = msgrcv( m_MsgKeyID, (void *) & m_Msg, sizeof(STR_MessageData)-sizeof(long), (1 >> 1), 0);
 

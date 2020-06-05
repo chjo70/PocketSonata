@@ -38,6 +38,13 @@ enum enRES_MESSAGE {
 } ;
 
 
+struct STR_RES_DUMP_LIST {
+    STR_REQ_DUMP_LIST strReqDumpList;
+
+    char cData[500];
+} ;
+
+
 
 // 랜 메시지 구조체
 union UNI_LAN_DATA {
@@ -47,7 +54,7 @@ union UNI_LAN_DATA {
     STR_REQ_DUMP_LIST strReqDumpList;
 
     // 송신 메시지 구조체 정의
-    char cData[500];
+    STR_RES_DUMP_LIST strResDumpList;
 
 };
 

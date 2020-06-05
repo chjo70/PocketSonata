@@ -2,6 +2,7 @@
 #define _MAIN_GLOBALS_
 
 #include <signal.h>
+#include <cassert>
 
 #include "cmain.h"
 #include "clog.h"
@@ -10,9 +11,7 @@
 #include "cprompt.h"
 #include "curbit.h"
 
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/ini_parser.hpp>
-
+#include "dev/minIni.h"
 
 
 extern void usrAppStart();
@@ -25,7 +24,7 @@ void signalHandler(int signo);
 CMySocket g_theMySocket( g_iKeyId++, (char *)"CMySocket" );
 
 
-
+void ReadINI();
 
 /**
  * @brief usrAppStart
@@ -42,6 +41,8 @@ void usrAppStart()
     signal( SIGHUP, signalHandler);
     signal( SIGTERM, signalHandler);
     signal( SIGSTOP, signalHandler);
+
+    ReadIni();
 
     //
     MAIN->Run();
@@ -78,7 +79,13 @@ void signalHandler( int signo )
    }
 
    printf( "\n SIGNO[%d] Handler\n" , signo );
-   exit(0);
+   //exit(0);
+
+}
+
+void ReadINI()
+{
+
 
 }
 

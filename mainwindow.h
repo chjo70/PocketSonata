@@ -5,7 +5,7 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 
-#include "CHexSpinBox.h"
+#include "chexspinbox.h"
 
 #include "../PocketSonata/_sysmsg.h"
 

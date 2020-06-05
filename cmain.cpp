@@ -11,8 +11,6 @@
 #include "cprompt.h"
 #include "curbit.h"
 
-#include "dev/minIni.h"
-
 
 extern void usrAppStart();
 
@@ -23,8 +21,6 @@ void signalHandler(int signo);
 // 아래에 타스크 관련 클래스를 정의합니다.
 CMySocket g_theMySocket( g_iKeyId++, (char *)"CMySocket" );
 
-
-void ReadINI();
 
 /**
  * @brief usrAppStart
@@ -41,8 +37,6 @@ void usrAppStart()
     signal( SIGHUP, signalHandler);
     signal( SIGTERM, signalHandler);
     signal( SIGSTOP, signalHandler);
-
-    ReadIni();
 
     //
     MAIN->Run();
@@ -83,12 +77,6 @@ void signalHandler( int signo )
 
 }
 
-void ReadINI()
-{
-
-
-}
-
 
 // 클래스 내의 정적 멤버변수 값 정의
 //char CMain::m_szClassName[LENGTH_OF_CLASSNAME] = { "CMain" };
@@ -100,6 +88,8 @@ CMain* CMain::pInstance = nullptr;
 CMain::CMain( int iKeyId, char *pClassName ) : CThread( iKeyId, pClassName )
 {
     LOGENTRY;
+
+    ReadIni();
 
 }
 
@@ -175,4 +165,12 @@ void CMain::_routine()
         }
     }
 
+}
+
+/**
+ * @brief CMain::ReadIni
+ */
+void CMain::ReadIni()
+{
+    m_theIni.setfilename( INI_FILE );
 }

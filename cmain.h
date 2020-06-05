@@ -1,20 +1,27 @@
 #ifndef CMAIN_H
 #define CMAIN_H
 
+using namespace std;
+
 #include "_system.h"
 #include "cthread.h"
 
+#include "dev/minIni.h"
 
 
+// INI 파일 정의
+#define INI_FILE    "packetSonata.ini"
 
 class CMain : public CThread
 {
 private:
     static CMain *pInstance;
-    //static char m_szClassName[LENGTH_OF_CLASSNAME];
+
+    minIni m_theIni;
 
 private:
     void Init();
+    void ReadIni();
 
 public:
     CMain( int iKeyId, char *pClassName=NULL );

@@ -19,6 +19,9 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
+private:
+    void EnableControl( bool bEnable );
+
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();

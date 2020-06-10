@@ -12,7 +12,7 @@ private:
     STR_MessageData *m_pMsg;
 
 private:
-
+    void SendQMessage();
 
 public:
     CRecLan( int iKeyId, char *pClassName=NULL );

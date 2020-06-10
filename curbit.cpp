@@ -34,7 +34,11 @@ void CUrBit::Run()
 void CUrBit::_routine()
 {
     LOGENTRY;
+    UNI_LAN_DATA *pLanData;
+
     m_pMsg = GetDataMessage();
+
+    pLanData = ( UNI_LAN_DATA * ) & m_pMsg->msg[0];
 
     while( true ) {
         if( QMsgRcv() == -1 ) {
@@ -42,6 +46,9 @@ void CUrBit::_routine()
         }
 
         switch( m_pMsg->opCode ) {
+            case enREQ_URBIT :
+                LOGMSG1( enNormal, "URBIT[%d]를 수행합니다 !!" , pLanData->uiUnit );
+                break;
 
             default:
                 //Log( enNormal, "AAA" );

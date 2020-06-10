@@ -4,7 +4,7 @@
 #include "_system.h"
 #include "cthread.h"
 
-#define NOOFOWNCMDS             (4)
+#define NOOFOWNCMDS             (6)
 
 
 
@@ -30,8 +30,12 @@ private:
     int CPromptparsePipe(char* str, char** strpiped);
 
 
+    // 내부 명령어 처리
     void MemoryDump( UINT uiStartAddress, UINT uiEndAddress=0 );
     void MemoryModify( UINT uiStartAddress, UINT uiDataType=1 );
+
+    // 외부 명령어 처리
+    void URBit( UINT uiData );
 
 public:
     CPrompt( int iKeyId, char *pClassName=NULL );

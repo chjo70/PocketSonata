@@ -2,12 +2,14 @@
 #include <term.h>
 #include <termios.h>
 #include <unistd.h>
+#include <curses.h>
 
 #include<readline/readline.h>
 #include<readline/history.h>
 
 #include "cprompt.h"
 #include "clog.h"
+#include "curbit.h"
 
 #define _DEBUG_
 
@@ -18,10 +20,24 @@
 // Clearing the shell using escape sequences
 #define clear() printf("\033[H\033[J")
 
-char CPrompt::m_szListOfOwnCmds[NOOFOWNCMDS][50] = { "md",
+char CPrompt::m_szListOfOwnCmds[NOOFOWNCMDS][50] = { "urbit",
+                                                     "md",
                                                      "mm",
+                                                     "cls",
                                                      "setenv",
                                                      "help" } ;
+
+typedef enum {
+    // 타겟 명령어
+    enURBIT=1,
+
+    // 콘솔 명령어
+    enMemoryDump,
+    enMemoryModify,
+    enClearScreen,
+    enSetEnv,
+    enHelp
+} enCommand;
 
 
 // 클래스 내의 정적 멤버변수 값 정의
@@ -70,11 +86,11 @@ int CPrompt::takeInput(char* str)
 {
     char* buf;
 
-    buf = readline( " $> " );
+    buf = readline( "$> " );
     if (strlen(buf) != 0) {
         add_history(buf);
         strcpy(str, buf);
-        
+
         return 0;
     } else {
         return 1;
@@ -84,36 +100,52 @@ int CPrompt::takeInput(char* str)
 // Help command builtin
 void CPrompt::openHelp( int iArg )
 {
+    int i;
+    char buffer[100];
+
     switch( iArg ) {
-        case 1 :
+        case enURBIT :
+            puts( "\n urbit [데이터] 데이터 값을 입력으로 URBIT를 수행합니다." );
+            puts( "\n\t\t [데이터] 데이터는 숫자 입력이며 0 부터 시작한다." );
+            break;
+
+        case enMemoryDump :
             puts( "\n md 시작_어드레스_값 [종료_어드레스_값], [데이터_크기] 형식으로 입력하여 시작 어드레스 값을 시작으로 메모리 값을 16진수로 표시합니다.");
             puts( "\n\t\t 시작_어드레스_값 : 시작 어드레스를 나타낸다.");
             puts( "\n\t\t 종료_어드레스_값 : 종료 어드레스를 나타낸다.");
             puts( "\n\t\t 데이터_크기 : 전시할 비트를 표시하며 1, 2, 4, 8 등으로 정할 수 있다.");
             break;
 
-        case 2 :
+        case enMemoryModify :
             puts( "\n mm 시작_어드레스_값, [데이터_크기] 형식으로 입력하여 시작 어드레스 값을 시작으로 메모리 값을 16진수로 표시합니다.");
             puts( "\n\t\t 시작_어드레스_값 : 시작 어드레스를 나타낸다.");
             puts( "\n\t\t 데이터_크기 : 전시할 비트를 표시하며 1, 2, 4, 8 등으로 정할 수 있다.");
             break;
 
+        case enClearScreen :
+            puts( "\n cls 콘솔의 화면을 깨끗하게 지웁니다.");
+            break;
+
         default :
             puts("\n 디버깅용 프로그램 쉘 입니다. 백 그라운드에서는 다른 프로세스가 실행되어 정상 운용이 되며 이 쉘을 통해서 간단 명령을 수행할 수 있습니다."
                 "\n 2020년 Copyright(c) @ 조철희"
-                "\nList of Commands supported:"
-                "\n>md"
-                "\n>mm"
-                "\n>exit"
-                "\n>improper space handling");
-                break;
+                "\n\nList of Commands supported:" );
+            for( i=0 ; i < NOOFOWNCMDS ; ++i ) {
+                sprintf( buffer, ">%s", m_szListOfOwnCmds[i] );
+                puts( buffer );
+            }
+            break;
 
     }
 
     return;
 }
 
-// Function to execute builtin commands
+/**
+ * @brief Function to execute builtin commands
+ * @param parsed
+ * @return
+ */
 int CPrompt::ownCmdHandler(char** parsed)
 {
     int i, switchOwnArg = 0;
@@ -129,7 +161,17 @@ int CPrompt::ownCmdHandler(char** parsed)
     }
 
     switch (switchOwnArg) {
-    case 1:
+    case enURBIT :
+        if( parsed[1] == 0 ) {
+            uiData = 0;
+        }
+        else {
+            uiData = atoi( parsed[1] );
+        }
+        URBit( uiData );
+        break;
+
+    case enMemoryDump :
         if( parsed[1] == 0 && m_uiDumpAddress == 0 ) {
             openHelp( switchOwnArg );
         }
@@ -143,7 +185,8 @@ int CPrompt::ownCmdHandler(char** parsed)
             MemoryDump( uiData );
         }
         break;
-    case 2:
+
+    case enMemoryModify :
         if( parsed[1] == 0 ) {
             openHelp( switchOwnArg );
         }
@@ -164,17 +207,29 @@ int CPrompt::ownCmdHandler(char** parsed)
             MemoryModify( uiData, uiData2 );
         }
         return 1;
-    case 3:
+    case enClearScreen :
+        if( parsed[1] != 0 ) {
+            openHelp( switchOwnArg );
+        }
+        else {
+            clear();
+        }
+        break;
+
+    case enHelp :
         openHelp();
         return 1;
-    case 4:
+
+    case enSetEnv :
         username = getenv("USER");
         printf("\nHello %s.\nMind that this is "
             "not a place to play around."
             "\nUse help to know more..\n",
             username);
         return 1;
+
     default:
+        openHelp();
         break;
     }
 
@@ -213,6 +268,13 @@ void CPrompt::parseSpace(char* str, char** parsed)
     }
 }
 
+/**
+ * @brief CPrompt::processString
+ * @param str
+ * @param parsed
+ * @param parsedpipe
+ * @return
+ */
 int CPrompt::processString(char* str, char** parsed, char** parsedpipe)
 {
     char* strpiped[2];
@@ -305,14 +367,15 @@ void CPrompt::MemoryModify( UINT uiStartAddress, UINT uiDataType )
         printf( "%08p %02x" , pAddress, *pAddress );
         pBuf = readline( " " );
 
-        if( *pBuf != 0 && *pBuf == '.' ) {
+        if( *pBuf == '.' ) {
+            break;
+        }
+        else if( *pBuf != 0 ) {
             // *pAddress = atoi( *pBuf );
             ++ pAddress;
             //printf( "\n" );
         }
-        else {
-            break;
-        }
+
     }
     while( true );
 
@@ -320,4 +383,30 @@ void CPrompt::MemoryModify( UINT uiStartAddress, UINT uiDataType )
     free( pBuffer );
 #endif
 
+}
+
+/**
+ * @brief CPrompt::URBit
+ * @param uiData
+ */
+void CPrompt::URBit( UINT uiData )
+{
+    UINT *puiUnit;
+    STR_MessageData sndMsg;
+
+    puiUnit = (UINT *) & sndMsg.msg[0];
+
+    sndMsg.mtype = 1;
+    sndMsg.opCode = enREQ_URBIT;
+    sndMsg.iSocket = 0;
+
+    *puiUnit = uiData;
+
+    if( msgsnd( URBIT->GetKeyId(), (void *)& sndMsg, sizeof(STR_MessageData)-sizeof(long), IPC_NOWAIT) < 0 ) {
+        perror( "msgsnd 실패" );
+    }
+    else {
+        // DisplayMsg( & sndMsg );
+
+    }
 }

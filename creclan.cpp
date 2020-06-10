@@ -47,9 +47,15 @@ void CRecLan::_routine()
         }
 
         switch( m_pMsg->opCode ) {
+            case enREQ_URBIT :
+                SendQMessage();
+                break;
+
             case enREQ_DUMP_LIST :
                 DumpList();
                 break;
+
+
             default:
                 //Log( enNormal, "AAA" );
                 break;
@@ -95,4 +101,12 @@ void CRecLan::DumpList()
 #ifdef _DEBUG_
     free( pBuffer );
 #endif
+}
+
+/**
+ * @brief CRecLan::SendQMessage
+ */
+void CRecLan::SendQMessage()
+{
+
 }

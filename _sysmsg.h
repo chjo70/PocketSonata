@@ -12,8 +12,11 @@ struct STR_LAN_HEADER {
 //////////////////////////////////////////////////////////////
 // 수신 메시지 정의
 enum enREQ_MESSAGE {
-    enREQ_DUMP_LIST = 0x1000,
+    // 타겟 명령어 정의
+    enREQ_URBIT = 0x1000,
 
+    // 디버깅 용
+    enREQ_DUMP_LIST = 0xF000,
 
 } ;
 
@@ -52,6 +55,7 @@ union UNI_LAN_DATA {
 
     // 수신 메시지 구조체 정의
     STR_REQ_DUMP_LIST strReqDumpList;
+    UINT uiUnit;
 
     // 송신 메시지 구조체 정의
     STR_RES_DUMP_LIST strResDumpList;

@@ -52,14 +52,12 @@ void MainWindow::on_pushButton_clicked()
     if( m_bConnect == false ) {
         m_theTcpSocket.connectToHost(QHostAddress::LocalHost, 8888 );
 
-        ui->MemoryDump->setEnabled(true);
-
     }
     else {
         m_theTcpSocket.close();
         m_bConnect = false;
 
-        ui->MemoryDump->setEnabled(false);
+        EnableControl( false );
     }
 
 }
@@ -74,6 +72,13 @@ void MainWindow::onConnectServer()
 
     m_bHeader = true;
 
+    EnableControl( true );
+
+}
+
+void MainWindow::EnableControl( bool bEnable )
+{
+    ui->MemoryDump->setEnabled( bEnable );
 }
 
 /**
